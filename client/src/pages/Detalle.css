@@ -1,0 +1,118 @@
+*{
+    box-sizing: border-box;
+}
+
+.imagen-producto{
+    width: 250px;
+    display: flex;
+    padding: 0;
+    margin: 0;
+}
+
+.contenedor-imagen{
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+}
+
+.nombre-usuario{
+    margin-left: 20px;
+}
+
+.estrellas{
+    margin-left: 20px;
+    
+}
+
+.controlar-mapa{
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    
+}
+
+.mapa{
+    width: 95vw;
+    
+}
+
+.descripcion{
+    margin: 0px 20px;
+    margin-bottom: 60px;
+}
+
+.ubicacion{
+    margin: 20px 20px;
+
+}
+
+.ofertar{
+    border-radius: 28px;
+    padding: 10px;
+    width: 250px;
+    background-color: rgb(201, 40, 126);
+    color: white;
+    text-decoration: none;
+    outline: none;
+    border: none;
+    margin: 40px 0px;
+    
+}
+
+.boton{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+
+}
+
+.titulo-detalle{
+    text-align: center;
+    margin: 20px 10px 10px 10px;
+    
+}
+
+.carrusel{
+    width: 95vw;
+    display: flex;
+}
+
+.control-carrusel{
+    display: flex;
+    justify-content: center;
+}
+
+
+
+@media (min-width: 768px) {
+    .mapa{
+        width: 70vw;
+        
+    }
+}
+
+@media (min-width: 1024px) {
+
+    .imagen-descripcion{
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .descripcion{
+        width: 50vw;
+    }
+
+    .usuario-descripcion{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+    }
+
+}
+
+@media (min-width: 1024px) {
+    .mapa{
+        width: 40vw;
+    }
+}

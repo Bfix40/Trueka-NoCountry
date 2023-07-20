@@ -1,0 +1,45 @@
+.acomodar{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    
+
+}
+
+.controlar-acomodar{
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+}
+
+.ofertar{
+    border-radius: 28px;
+    padding: 10px;
+    width: 250px;
+    background-color: rgb(201, 40, 126);
+    color: white;
+    text-decoration: none;
+    outline: none;
+    border: none;
+    margin: 40px 0px;
+    
+}
+
+.articulo-ofrecer{
+    display: flex;
+    margin: 20px;
+    justify-content: center;
+
+}
+
+.ver-todos{
+    display: flex;
+    margin: 20px;
+    justify-content: flex-end;
+}
+
+.publica{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
