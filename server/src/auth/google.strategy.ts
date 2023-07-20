@@ -9,7 +9,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
         super({
             clientID: GOOGLE_CLIENT_ID,
             clientSecret: GOOGLE_SECRET,
-            callbackURL: 'http://localhost:3000/api/v1/auth/google/callback',
+            callbackURL: 'https://trueka-nocountry-production.up.railway.app/',
             scope: ['email', 'profile']
         })
     }
