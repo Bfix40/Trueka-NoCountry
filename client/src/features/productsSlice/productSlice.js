@@ -2,8 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // dejo armado el slice, asi ya despues solo cambiamos la ruta
 
-const API_URL =
-    "https://trueka-nocountry-production.up.railway.app/api/v1/products";
+const API_URL = 'http://localhost:3000/api/v1/products'
 
 export const createProduct = createAsyncThunk('products/create', async (args, thunkAPI) => {
   const { token, product } = args
