@@ -20,7 +20,7 @@ function Login() {
   }
 
   const handleGoogleLogin = () => {
-    window.location.href = 'https://somber-cover-production.up.railway.app/api/v1/google'
+    window.location.href = 'http://localhost:3000/api/v1/google'
   }
 
   return (
