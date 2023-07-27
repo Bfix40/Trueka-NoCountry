@@ -11,7 +11,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_SECRET,
-      callbackURL: process.env.CALLBACK_URL,
+      callbackURL: process.env.CALLBACK_URL || 'https://trueka-nocountry-production.up.railway.app/v1/auth/google/callback',
       scope: ['email', 'profile'],
     });
   }
