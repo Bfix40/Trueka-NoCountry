@@ -2,12 +2,14 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 const API_URL = 'http://localhost:3000/api/v1/categories'
 
-export const createCategories = createAsyncThunk('categories/post', async (category, thunkAPI) => {
+export const createCategories = createAsyncThunk('categories/post', async (args, thunkAPI) => {
+  const { token, category } = args
   try {
     const response = await fetch(`${API_URL}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(category)
     })
@@ -63,12 +65,14 @@ export const getCategoriesById = createAsyncThunk('categories/getByid', async (i
   }
 })
 
-export const modifyCategoryById = createAsyncThunk('categories/modify', async (categoryId, newCategory, thunkAPI) => {
+export const modifyCategoryById = createAsyncThunk('categories/modify', async (args, thunkAPI) => {
+  const { token, categoryId, newCategory } = args
   try {
     const response = await fetch(`${API_URL}/${categoryId}`, {
       method: 'PATCH',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(newCategory)
     })
@@ -84,12 +88,14 @@ export const modifyCategoryById = createAsyncThunk('categories/modify', async (c
   }
 })
 
-export const deleteCategoryById = createAsyncThunk('categories/delete', async (categoryId, thunkAPI) => {
+export const deleteCategoryById = createAsyncThunk('categories/delete', async (args, thunkAPI) => {
+  const { token, categoryId } = args
   try {
     const response = await fetch(`${API_URL}/${categoryId}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       }
     })
     if (!response.ok) {

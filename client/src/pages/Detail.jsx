@@ -1,47 +1,56 @@
 /* eslint-disable multiline-ternary */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Loading from '../components/Loading'
 import MapView from '../components/MapView/MapView'
 import './Detalle.css'
-import Button from 'react-bootstrap/esm/Button'
-import Carousel from '../components/carousel/Carousel'
-import LocationName from '../components/LocationName/LocationName'
 
 // import Estrellas from './Perfil/Estrellas'
 // import PerfilUser from './Perfil/PerfilUser'
-import Ofertar from './Ofertar'
 /* Redux toolkit imports */
 import { useDispatch, useSelector } from 'react-redux'
-import { getUserById } from '../features/authSlice/authSlice'
+import { clearUserById, getUserById } from '../features/authSlice/authSlice'
 import { getProductById } from '../features/productsSlice/productSlice'
-import { setLocation } from '../features/location/location'
+import Comments from '../components/Comments/Comments'
 /* custom Hook Local Storage */
 
 export default function Detail () {
   const product = useSelector((state) => state?.productsDb?.productById)
   const userInfo = useSelector((state) => state.authUser?.userById)
   const geoLocation = JSON.parse(localStorage.getItem('geo'))
+  const userID = localStorage.getItem('userId')
   const lat = parseFloat(geoLocation.lat)
   const lon = parseFloat(geoLocation.lon)
   const dispatch = useDispatch()
   const { id, owner } = useParams()
 
   useEffect(() => {
-    if (product !== false) {
+    const token = localStorage.getItem('token')
+
+    if (product !== false && product?._id !== id) {
       dispatch({ type: 'products/clearProductById' })
     }
 
-    if (owner !== '64aba27c2415d442b78559c1') {
-      dispatch(getUserById(owner))
+    if (userInfo?._id !== owner) {
+      dispatch({ type: 'authUser/clearUserById' })
     }
 
+    if (owner !== '64aba27c2415d442b78559c1' && userInfo === null) {
+      dispatch(getUserById({ token, UserId: owner }))
+        .then((res) => {
+          // console.log('Usuario obtenido:', res)
+        })
+        .catch((err) => {
+          return err
+        })
+    }
     dispatch(getProductById(id))
   }, [])
 
   useEffect(() => {
     if (owner !== '64aba27c2415d442b78559c1' && product !== false) {
-      dispatch(getUserById(owner))
+      const token = localStorage.getItem('token')
+      dispatch(getUserById({ token, UserId: owner }))
     }
   }, [product, dispatch])
 
@@ -80,9 +89,10 @@ export default function Detail () {
               <div className='mapa'><MapView longitude={lon} latitude={lat} /></div>
 
             </div>
-            <LocationName />
+            <br />
+            {/* <LocationName /> */}
             <div className='boton'>
-              <Link to={`/ofertar/${product?._id}`}><button className='ofertar' product={product}>Ofertar</button></Link>
+              <Link to={`/ofertar/${product?._id}/${userID}`}><button className='ofertar' product={product}>Ofertar</button></Link>
 
             </div>
             <h6 className='ubicacion'>Otras publicaciones de este usuario.</h6>
@@ -96,6 +106,8 @@ export default function Detail () {
             </div>
 
           </div>
+          <Comments />
+
            </>
           ) : <Loading />}
     </>

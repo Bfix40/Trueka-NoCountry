@@ -4,7 +4,7 @@
     z-index: 100;
     width: 100%;
     min-width: 280px;
-    max-width: 600px;
+    max-width: 600px;   
 }
 
 #input-bot:focus{
@@ -12,6 +12,9 @@
     box-shadow: none; 
 }
 
+.form-select{
+    color: black !important;
+}
 
 .input-title{
     margin-bottom: 0;

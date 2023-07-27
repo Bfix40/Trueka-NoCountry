@@ -81,7 +81,7 @@ export class OffersService {
         { new: true },
       );
       if (!offerToUpdate) {
-        throw new Error(`Invoice ${id} not found`);
+        throw new Error(`Offer ${id} not found`);
       }
       return offerToUpdate;
     } catch (error) {

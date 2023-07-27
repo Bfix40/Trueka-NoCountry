@@ -1,7 +1,12 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
+import { calcularReputacion } from '../calculaReputacion'
 
 // recibe un numero, el "raiting del usuario" y retorna las estrellas que corresponden de acuerdo a ese raiting
-const Stars = ({ number }) => {
+const Stars = () => {
+  const reputacion = useSelector(state => state?.reputacion)
+  const number = calcularReputacion(reputacion)
+
   const total = 5
   const ratingReal = (number / 2)
   const starIconLleno = 'star-sharp'

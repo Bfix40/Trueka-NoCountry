@@ -6,7 +6,7 @@ const API_URL = 'http://localhost:3000/api/v1/users'
 export const createUser = createAsyncThunk('authUser/register', async (user, thunkAPI) => {
   // const { email, password, firstName,lastName,contact,address } = user
   try {
-    const response = await fetch(`${API_URL}/register`, {
+    const response = await fetch(`${API_URL}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -46,12 +46,15 @@ export const getUsers = createAsyncThunk('authUser/getUsers', async (_, thunkAPI
 })
 
 //  traemos un usuario por su id
-export const getUserById = createAsyncThunk('authUser/getUserById', async (UserId, thunkAPI) => {
+export const getUserById = createAsyncThunk('authUser/getUserById', async (args, thunkAPI) => {
   try {
+    // console.log('argumentos -->', args)
+    const { token, UserId } = args
     const response = await fetch(`${API_URL}/${UserId}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       }
     })
     if (!response.ok) {
@@ -65,17 +68,19 @@ export const getUserById = createAsyncThunk('authUser/getUserById', async (UserI
   }
 })
 
-export const modifyUser = createAsyncThunk('authUser/modifyUser', async (userId, newUserData, thunkAPI) => {
+export const modifyUser = createAsyncThunk('authUser/modifyUser', async (args, thunkAPI) => {
+  const { token, userId, newUserData } = args
   try {
     const response = await fetch(`${API_URL}/${userId}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
-        'Content-Type': 'application/json'
+        // 'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(newUserData)
     })
     if (!response.ok) {
-      const error = await response.json()
+      const error = await response.text()
       return thunkAPI.rejectWithValue(error)
     }
     const data = await response.json()
@@ -85,12 +90,14 @@ export const modifyUser = createAsyncThunk('authUser/modifyUser', async (userId,
   }
 })
 
-export const deleteUser = createAsyncThunk('authUser/deleteUser', async (userId, thunkAPI) => {
+export const deleteUser = createAsyncThunk('authUser/deleteUser', async (args, thunkAPI) => {
+  const { token, userId } = args
   try {
     const response = await fetch(`${API_URL}/${userId}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       }
     })
     if (!response.ok) {
@@ -120,7 +127,8 @@ const authSlice = createSlice({
     userById: null,
     isLoading: false,
     error: null,
-    isAdmin: false
+    isAdmin: false,
+    update: false
   },
   reducers: {
     successLogin: (state) => {
@@ -181,9 +189,9 @@ const authSlice = createSlice({
       })
       .addCase(modifyUser.fulfilled, (state, action) => {
         state.isLoading = false
-        state.user = action.payload // se supone que es para el usuario loguiado en este caso permitira modificar sus datos
-        state.isAuthenticated = true // hay que dejarlo en falso si queremos que al modificar los datos no se loguee de nuevo
-        // state.token = action.payload.token //suponiendo que devuelve un token
+        state.user = action.payload
+        state.isAuthenticated = true
+        state.update = true
       })
       .addCase(modifyUser.rejected, (state, action) => {
         state.isLoading = false

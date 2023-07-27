@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DotEnvConfig } from './config/env.config';
@@ -12,7 +17,11 @@ import { LoginController } from './login/login.controller';
 import { AuthModule } from './auth/auth.module';
 import { LocalUploadMiddleware } from './middlewares/local-upload.middleware';
 import { FirebaseUploadMiddleware } from './middlewares/firebase-upload.middleware';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { OffersModule } from './offers/offers.module';
+//import { CommentsGateway } from './comments/comments.gateway';
+import { CommentsModule } from './comments/comments.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -21,6 +30,7 @@ import { OffersModule } from './offers/offers.module';
     ConfigModule.forRoot({
       load: [DotEnvConfig],
     }),
+    EventEmitterModule.forRoot(),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -32,11 +42,17 @@ import { OffersModule } from './offers/offers.module';
     SubcategoriesModule,
     ProductsModule,
     OffersModule,
+    CommentsModule,
+    MessagesModule,
   ],
   controllers: [AppController, LoginController],
-  providers: [AppService, LocalUploadMiddleware, FirebaseUploadMiddleware],
+  providers: [
+    AppService,
+    LocalUploadMiddleware,
+    FirebaseUploadMiddleware,
+    //CommentsGateway,
+  ],
 })
-
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer

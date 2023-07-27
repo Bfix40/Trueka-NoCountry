@@ -1,34 +1,101 @@
-import React, { useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+/* eslint-disable react/jsx-indent */
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 // import { fetchProductById, getProducts } from '../features/products/fetchProducts'
-import OfertarCards from './OfertarCards'
 import './Ofertar.css'
+import CardProduct from '../components/CardProduct'
+import { getProductById, getProducts } from '../features/productsSlice/productSlice'
+import { clearUserById, getUserById } from '../features/authSlice/authSlice'
+import { toast } from 'react-toastify'
+import { createOffer } from '../features/offers/offerSlice'
 
 const Ofertar = () => {
-  const product = useSelector((state) => state?.products?.productById)
-  const loading = useSelector((state) => state?.products?.loading)
-  const globalProduct = useSelector((state) => state?.products?.products)
+  const product = useSelector((state) => state?.productsDb?.productById)
+  const userProducts = useSelector((state) => state.authUser?.userById?.products)
+  const userOn = useSelector((state) => state.authUser?.userById)
+  const token = localStorage.getItem('token')
+
   const dispatch = useDispatch()
+  const { id, userID } = useParams()
+  const navigate = useNavigate()
 
-  const { id } = useParams()
+  const [formState, setFormState] = useState({
+    status: 'pending',
+    offerOwnerId: userID,
+    offerTargetItem: id,
+    offeredItems: []
+  })
 
-  console.log('recibo en ofertar')
+  const [shownToast, setShownToast] = useState(false)
 
-  console.log(id)
+  const cardSelect = (id) => {
+    if (formState.offeredItems?.includes(id)) {
+      setFormState((prevFormState) => ({
+        ...prevFormState,
+        offeredItems: prevFormState.offeredItems.filter((cardId) => cardId !== id)
+      }))
+    } else {
+      setFormState((prevFormState) => ({
+        ...prevFormState,
+        offeredItems: [...prevFormState.offeredItems, id]
+      }))
+    }
+  }
+
+  const resetForm = () => {
+    setFormState((prevFormState) => ({
+      ...prevFormState,
+      offeredItems: []
+    }))
+  }
+
+  const dispatchForm = (form, token) => {
+    dispatch(createOffer({ token, offer: form }))
+      .then((res) => {
+        toast.success('oferta enviada correctamente')
+        navigate(`/detalle/${id}/${product?.owner}`)
+        resetForm()
+      })
+  }
+
+  const submitHandler = () => {
+    const formData = new FormData()
+    const offeredArray = JSON.stringify(formState.offeredItems)
+    formData.append('status', formState.status)
+    formData.append('offerOwnerId', formState.offerOwnerId)
+    formData.append('offerTargetItem', formState.id)
+    formData.append('offeredItems', offeredArray)
+
+    if (formState.offeredItems.length > 0) {
+      dispatchForm(formState, token)
+    }
+  }
 
   useEffect(() => {
-    // dispatch(fetchProductById(id))
-  }, [dispatch])
+    if (userID === product?.owner && !shownToast) {
+      toast.error('No podes ofertar a tu propia publicación', { toastId: 'custom-toast', autoClose: 2500 })
+      setShownToast(true)
+      navigate('/')
+      setShownToast(false)
+    }
+    dispatch(clearUserById())
+  }, [])
 
-  console.log(globalProduct)
+  useEffect(() => {
+    dispatch(getProductById(id))
+    dispatch(getProducts())
+    if (userID !== '64aba27c2415d442b78559c1') {
+      dispatch(getUserById({ token, UserId: userID }))
+    }
+  }, [dispatch])
 
   return (
     <div>
-      <h3 className='titulo-detalle'>{product.title}</h3>
+      <h3 className='titulo-detalle'>{product?.name}</h3>
       <div className='imagen-descripcion'>
         <div className='contenedor-imagen'>
-          <img src={product.image} alt='' className='imagen-producto' />
+          <img src={product?.images} alt='' className='imagen-producto' />
         </div>
       </div>
 
@@ -42,11 +109,33 @@ const Ofertar = () => {
         <Link><h6>Ver todos.</h6></Link>
       </div>
 
-      <div className='acomodar'>
-        {globalProduct.map(prod => <div key={prod.id}><OfertarCards prod={prod} /></div>)}
-      </div>
+    {userOn?._id === userID
+      ? (
+    <div className='acomodar'>
+        {userProducts?.map((prod, i) =>
+          (
+          <div key={prod?._id} className='offer-card-container' id='offer-card-container'>
+          <label htmlFor={`productCard${i}`}>
+          <div
+            onClick={() => cardSelect(prod._id)}
+            className='div-card'
+          >
+            <CardProduct props={[prod]} />
+          </div>
+          </label>
+
+          <div className='checkbox-card'>
+            <input type='checkbox' name='cardSelected' id={`productCard${i}`} />
+          </div>
+
+          </div>
+
+          ))}
+    </div>)
+      : ''}
+
       <div className='boton'>
-        <button className='ofertar' product={product}>Confirmar Oferta</button>
+        <button className='ofertar' product={product} onClick={() => { submitHandler() }}>Confirmar Oferta</button>
 
       </div>
       <div className='publica'>

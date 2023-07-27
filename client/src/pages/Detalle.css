@@ -38,11 +38,13 @@
 
 .descripcion{
     margin: 0px 20px;
-    margin-bottom: 60px;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 .ubicacion{
     margin: 20px 20px;
+    text-align: center;
 
 }
 
@@ -86,7 +88,7 @@
 
 @media (min-width: 768px) {
     .mapa{
-        width: 70vw;
+        width: 40vw;
         
     }
 }
@@ -100,19 +102,27 @@
 
     .descripcion{
         width: 50vw;
+        text-align: center;
     }
 
     .usuario-descripcion{
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-evenly;
+        justify-content: center;
+    }
+
+    .titulo-detalle{
+        display: flex;
+        margin-right: 220px;        
+        justify-content: flex-end;
     }
 
 }
 
-@media (min-width: 1024px) {
-    .mapa{
-        width: 40vw;
+@media (min-width: 1300px) {
+    .titulo-detalle{
+        margin-right: 350px;        
     }
+    
 }

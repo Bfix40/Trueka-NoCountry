@@ -8,18 +8,21 @@ import {
   Delete,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
-import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { OfferStatus } from './entities/offer.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@ApiBearerAuth()
 @ApiTags('Offers')
 @Controller('offers')
 export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UsePipes(
     new ValidationPipe({
@@ -31,16 +34,19 @@ export class OffersController {
     return this.offersService.create(createOfferDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.offersService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.offersService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @UsePipes(
     new ValidationPipe({
@@ -52,6 +58,7 @@ export class OffersController {
     return this.offersService.update(id, updateOfferDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.offersService.remove(id);

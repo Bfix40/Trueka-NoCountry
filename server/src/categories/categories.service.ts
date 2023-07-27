@@ -70,7 +70,7 @@ export class CategoriesService {
         { new: true },
       );
       if (!categoryUpdate) {
-        throw new Error(`Invoice ${id} not found`);
+        throw new Error(`Category ${id} not found`);
       }
       return categoryUpdate;
     } catch (error) {

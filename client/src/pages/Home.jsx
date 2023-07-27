@@ -6,18 +6,21 @@ import { getProducts } from '../features/productsSlice/productSlice'
 import '../pages/styles/Home.css'
 import Carousel from '../components/carousel/Carousel'
 import { Link } from 'react-router-dom'
-import MapWithSearch from '../components/MapWithSearch/MapWithSearch'
 
 function Home () {
   const products = useSelector((state) => state?.productsDb?.products)
-  const error = useSelector((state) => state?.productsDb?.error)
   const loading = useSelector((state) => state?.productsDb?.loading)
   const results = useSelector((state) => state?.productsDb?.searchResults)
+  // console.log(products, 'estas son las results')
   const latest = [...products].reverse().slice(0, 12)
   const location = useSelector((state) => state?.location)
   const dispatch = useDispatch()
   const [nearbyProducts, setNearbyProducts] = useState([])
-  const [distanceFilter, setDistanceFilter] = useState(10)
+  const [filterKilometers, setFilterKilometers] = useState(10)
+
+  const handleKilometersChange = (event) => {
+    setFilterKilometers(event.target.value)
+  }
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371
@@ -34,100 +37,103 @@ function Home () {
     return distance
   }
 
-  const gridTemplateColumns = results.length < 6 ? 'repeat(auto-fit, minmax(170px, 200px))' : 'repeat(auto-fit, minmax(190px, 0.4fr))'
+  const gridTemplateColumns =
+    results.length < 6
+      ? 'repeat(auto-fit, minmax(170px, 200px))'
+      : 'repeat(auto-fit, minmax(190px, 0.4fr))'
 
   useEffect(() => {
     dispatch(getProducts())
   }, [dispatch])
 
-  useEffect(() => {
-    // console.log(products)
-    // console.log(error)
-  }, [products])
-
-  useEffect(() => {
+  const handleFilterSubmit = (event) => {
+    event.preventDefault()
     if (location.latitude && location.longitude) {
       const nearbyProducts = products.filter((product) => {
         const distance = calculateDistance(
           location.latitude,
           location.longitude,
-          product.latitude,
-          product.longitude
+          product.geolocation.lat,
+          product.geolocation.lon
         )
-        return distance <= distanceFilter // cambiar luego con filtro por distancia
+        return distance <= filterKilometers
       })
       setNearbyProducts(nearbyProducts)
     }
-  }, [location, products])
+  }
+
+  const handleClearFilter = () => {
+    setNearbyProducts([])
+  }
+
+  const filteredProducts = nearbyProducts.length > 0 ? nearbyProducts : products
 
   return (
     <>
+      <form className='distance-filter-container' onSubmit={handleFilterSubmit}>
+        <label htmlFor='filterKilometers'>Filtrar por kilómetros:</label>
+        <input
+          type='number'
+          id='filterKilometers'
+          name='filterKilometers'
+          value={filterKilometers}
+          onChange={handleKilometersChange}
+        />
+        <button type='submit'>Aplicar filtro</button>
+        <button type='button' onClick={handleClearFilter}>Limpiar filtro</button>
+      </form>
       {loading
         ? (
           <div className='loading-container'>
             <Loading />
           </div>
-
           )
-        : (
-            !results
-              ? (
-                <div className='controlar-home-container'>
-                  <div className='home-container'>
-                    <div className='carousel-rows-container'>
-                      <div className='p-carousel-container'>
-                        <MapWithSearch />
-
-                        <div className='title-and-more-container'>
-                          <p className='carousel-title'>Últimas publicaciones</p>
-                          <Link>
-                            <p className='view-more-p'>Ver mas</p>
-                          </Link>
-                        </div>
-
-                        <Carousel data={latest} />
-                      </div>
-
-                      <div className='p-carousel-container'>
-
-                        <div className='title-and-more-container'>
-                          <p className='carousel-title'>Publicaciones populares</p>
-                          <Link>
-                            <p className='view-more-p'>Ver mas</p>
-                          </Link>
-                        </div>
-
-                        <Carousel data={products} />
-                      </div>
-
-                      <div className='p-carousel-container'>
-
-                        <div className='title-and-more-container'>
-                          <p className='carousel-title'>Publicaciones que seguís</p>
-                          <Link>
-                            <p className='view-more-p'>Ver mas</p>
-                          </Link>
-                        </div>
-
-                        <Carousel data={products} />
-                      </div>
-
+        : filteredProducts
+          ? (
+            <div className='controlar-home-container'>
+              <div className='home-container'>
+                <div className='carousel-rows-container'>
+                  <div className='p-carousel-container'>
+                    <div className='title-and-more-container'>
+                      <p className='carousel-title'>Publicaciones populares</p>
+                      <Link>
+                        <p className='view-more-p'>Ver mas</p>
+                      </Link>
                     </div>
+                    <Carousel data={filteredProducts} />
                   </div>
-                </div>)
-              : (results !== 'none'
-                  ? (
-                    <>
-                      <div className='home-container'>
-                        <div className='products-container' style={{ gridTemplateColumns }}>
-                          <CardProduct className='products-list' props={results} />
-                        </div>
+                  <div className='p-carousel-container'>
+                    <div className='title-and-more-container'>
+                      <p className='carousel-title'>Publicaciones que seguís</p>
+                      <Link>
+                        <p className='view-more-p'>Ver mas</p>
+                      </Link>
+                    </div>
+                    <Carousel data={filteredProducts} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            )
+          : products !== 'none'
+            ? (
+              <>
+                <div className='home-container'>
+                  {products.length > 0
+                    ? (
+                      <div className='products-container' style={{ gridTemplateColumns }}>
+                        <CardProduct className='products-list' props={nearbyProducts} />
                       </div>
-
-                    </>)
-                  : <div className='home-container carousel-title'>No se encontraron resultados </div>
-                )
-          )}
+                      )
+                    : (
+                      <div className='home-container carousel-title'>No se encontraron resultados</div>
+                      )}
+                </div>
+              </>
+              )
+            : (
+              <div className='home-container carousel-title'>No se encontraron resultados</div>
+              )}
     </>
   )
 }

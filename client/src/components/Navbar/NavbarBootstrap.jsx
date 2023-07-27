@@ -9,10 +9,13 @@ import './NavbarBootstrap.css'
 import SearchBar from '../Search/SearchBar'
 // import CategoryTest from '../categoryTest/CategoryTest'
 import { Link } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import CategoryTest from '../categoryTest/CategoryTest'
+import SubmenuUser from '../SubmenuUser/SubmenuUser'
 
 function NavBarBootstrap () {
+  const userLogin = useSelector(state => state?.autenticacion?.isAuthenticated)
+
   const dispatch = useDispatch()
 
   const handleLogoClick = () => {
@@ -23,7 +26,7 @@ function NavBarBootstrap () {
     <>
       {['sm'].map((expand) => (
 
-        <Navbar key={expand} expand={expand} className='navbar'>
+        <Navbar key={expand} expand={expand} className='navbar' style={{ overflow: 'visible !important', overflowX: 'visible', overflowY: 'visible' }}>
           <div className='logo-container'>
             <div className='logo-buscador'>
               <div className='div-logo' onClick={handleLogoClick}>
@@ -34,7 +37,7 @@ function NavBarBootstrap () {
             </div>
 
             <Container className='container'>
-              <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
+              <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} className='border-0' />
               <Navbar.Offcanvas
                 id={`offcanvasNavbar-expand-${expand}`}
                 aria-labelledby={`offcanvasNavbarLabel-expand-${expand}`}
@@ -44,9 +47,7 @@ function NavBarBootstrap () {
                   <Offcanvas.Title id={`offcanvasNavbarLabel-expand-${expand}`} />
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                  <Nav className='justify-content-end  pe-3'>
-                    {/* aca va el boton de categorias */}
-                    {/* <Nav.Link href='#action1'><CategoryTest /></Nav.Link> */}
+                  <Nav className='justify-content-end  pe-3'>                    
                     <CategoryTest />
                   </Nav>
                   <div className='form'>
@@ -60,12 +61,22 @@ function NavBarBootstrap () {
               <Link to='/'><img src='/images/Group 23.png' alt='' className='logo' /></Link>
             </div>
           </div>
-          <Link to='/login'><div className='perfil'>
-            <img src='/images/account_circle_filled_24px.png' alt='' className='imagen-perfil' />
-            <Link to='/login' className='usuarios'>Usuarios</Link>
-            {/* <NavLink to='/' className='item-navbar'><span >Inicio</span></NavLink> */}
-                            </div>
-          </Link>
+          {
+            userLogin
+              ? <SubmenuUser />
+
+              : (
+                <Link to='/login'>
+                  <div className='perfil'>
+                    <img src='/images/account_circle_filled_24px.png' alt='' className='imagen-perfil' />
+                    <p className='usuarios'>Usuario</p>
+                    {/* <Link to='/login' className='usuarios'>Usuarios</Link> */}
+                    {/* <NavLink to='/' className='item-navbar'><span >Inicio</span></NavLink> */}
+                  </div>
+                </Link>
+                )
+          }
+
         </Navbar>
 
       ))}

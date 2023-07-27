@@ -38,11 +38,17 @@
 .formSelect option:selected {
   /* Estilos para la opción seleccionada */
   background-color: #007bff;
-  color: #fff;
+  color: #fff !important;
 }
+
+
 
 .form-select{
   color: white !important;
   padding-right: 0px !important;
   
+}
+
+#categorySelect{
+  color: white !important;
 }

@@ -68,7 +68,7 @@ export class SubcategoriesService {
         { new: true },
       );
       if (!subCategoryUpdate) {
-        throw new Error(`Invoice ${id} not found`);
+        throw new Error(`Subcategory ${id} not found`);
       }
       return subCategoryUpdate;
     } catch (error) {

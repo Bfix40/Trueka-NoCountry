@@ -8,6 +8,7 @@ async function bootstrap() {
 
   // Documentation
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('Trueka REST-full API')
     .setDescription('Trueka endpoints')
     .setVersion('1.0')

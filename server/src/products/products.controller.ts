@@ -8,19 +8,23 @@ import {
   Delete,
   ValidationPipe,
   UsePipes,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@ApiBearerAuth()
 @ApiTags('Products')
 @Controller('products')
 export class ProductsController {
@@ -35,6 +39,7 @@ export class ProductsController {
   @ApiBadRequestResponse({
     description: 'Bad request in Product data.',
   })
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UsePipes(
     new ValidationPipe({
@@ -81,6 +86,7 @@ export class ProductsController {
 
   @ApiOkResponse({ description: 'Product successfully updated' })
   @ApiNotFoundResponse({ description: 'Product id not found' })
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(id, updateProductDto);
@@ -88,7 +94,7 @@ export class ProductsController {
 
   @ApiOkResponse({ description: 'Product successfully deleted' })
   @ApiNotFoundResponse({ description: 'Product id not found' })
-  //  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);

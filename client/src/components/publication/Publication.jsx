@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-indent */
+/* eslint-disable no-undef */
 import './styles/publication.css'
 import 'swiper/css'
 import Input from './Input'
@@ -7,25 +9,32 @@ import { getCategories, getCategoriesById } from '../../features/categoriesSlice
 import { createProduct } from '../../features/productsSlice/productSlice'
 import PBCarousel from './PBCarousel'
 import { obtenerCoordenadas } from '../../features/pruebaBarrioSlice/pruebaBarrioSlice'
+import MapWithSearch from '../MapWithSearch/MapWithSearch'
+import AlertPublication from './Alert'
 
 function Publication () {
+  const userData = useSelector((state) => state?.autenticacion?.user)
+  const userToken = useSelector((state) => state?.autenticacion?.token)
   const [formState, setformState] = useState({
-    owner: '64aba27c2415d442b78559c1',
+    owner: userData?._id,
     name: '',
     category: '',
     subcategory: '',
     images: [],
     location: '',
     description: '',
-    lon: '-58.44924',
-    lat: '-34.57365'
+    lon: '',
+    lat: ''
   })
+
   const [files, setFiles] = useState([])
+  const [postState, setPostState] = useState('')
   const categories = useSelector((state) => state?.categories?.categories)
   const subCategory = useSelector((state) => state?.categories?.category)
-  const barrio = useSelector((state) => state?.barrio?.cordenadas)
+  const lat = useSelector((state) => state?.location?.lat)
 
   const dispatch = useDispatch()
+  let formData = new FormData()
 
   const height = files.length > 0 ? '142px' : '0'
   const opacity = files.length > 0 ? '1' : '0'
@@ -48,26 +57,44 @@ function Publication () {
     }))
   }
 
+  const handleAlert = () => {
+    if (postState === 'successfull' || postState === 'failed') {
+      setPostState('')
+      resetValues()
+      formData = new FormData()
+      localStorage.removeItem('latitude')
+      localStorage.removeItem('longitude')
+    }
+
+    if (postState === 'wrongData') {
+      setPostState('')
+    }
+  }
+
   const resetValues = () => {
     setformState({
-      owner: '64aba27c2415d442b78559c1',
+      owner: userData?._id,
       name: '',
       category: '',
       subcategory: '',
       images: [],
       location: '',
       description: '',
-      lon: '-58.44924',
-      lat: '-34.57365'
+      lon: '',
+      lat: ''
     })
 
     setFiles([])
   }
 
-  const submitForm = (form) => {
-    dispatch(createProduct(form))
+  const submitForm = (token, form) => {
+    dispatch(createProduct({ token, product: form }))
       .then((res) => {
         console.log('res ->', res)
+        if (res.type === 'products/create/rejected') {
+          setPostState('failed')
+        }
+        if (res.type === 'products/create/fulfilled') { setPostState('successful') }
       })
       .catch((err) => {
         console.log('err ->', err)
@@ -79,7 +106,8 @@ function Publication () {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    let formData = new FormData()
+    console.log(postState)
+
     formData.append('owner', formState.owner)
     formData.append('name', formState.name)
     formData.append('category', formState.category)
@@ -87,8 +115,8 @@ function Publication () {
     files.forEach((image) => formData.append('images', image))
     formData.append('location', formState.location)
     formData.append('description', formState.description)
-    formData.append('lon', barrio.longitude)
-    formData.append('lat', barrio.latitude)
+    formData.append('lon', formState.lon)
+    formData.append('lat', formState.lat)
 
     let logged = false
     formData.forEach((value, key) => {
@@ -100,12 +128,18 @@ function Publication () {
       }
     })
 
-    formState.name !== '' && formState.category !== '' && formState.subcategories !== '' && formState.images.length > 0 && formState.images.length <= 10 && formState.description !== '' ? submitForm(formData) : console.log('Inputs vacios o excede las 10 imagenes')
-
-    setTimeout(() => {
-      resetValues()
-      formData = new FormData()
-    }, 200)
+    formState.name !== '' &&
+    formState.category !== '' &&
+    formState.subcategories !== '' &&
+    formState.images.length > 0 &&
+    formState.images.length <= 10 &&
+    formState.description !== '' &&
+    formState.lat !== '' &&
+    formState.lon !== '' &&
+    formState.lat !== null &&
+    formState.lon !== null
+      ? submitForm(userToken, formData)
+      : setPostState('wrongData')
   }
 
   useEffect(() => {
@@ -120,10 +154,20 @@ function Publication () {
   }, [formState.category])
 
   useEffect(() => {
-    if (formState.location !== '') {
-      dispatch(obtenerCoordenadas(formState.location))
-    }
-  }, [dispatch, formState.location])
+    const latitude = localStorage.getItem('latitude')
+    const longitude = localStorage.getItem('longitude')
+
+    setformState((prevFormState) => ({
+      ...prevFormState,
+      lon: longitude,
+      lat: latitude
+    }))
+  }, [localStorage.getItem('longitude'), dispatch, lat])
+
+  useEffect(() => {
+    localStorage.removeItem('latitude')
+    localStorage.removeItem('longitude')
+  }, [])
 
   return (
     <>
@@ -175,9 +219,10 @@ function Publication () {
         </div>
 
         <div className='custom-container'>
-          <Input ids='input-bot' placeh='Ej:Pais, Ciudad, Localidad' type='text' name='location' onInputChange={handleInputChange}>
-            Indicá dónde se encuentra el artículo que querés publicar
-          </Input>
+
+          <h6 className='input-title'>Indicá dónde se encuentra el artículo que querés publicar</h6>
+          <MapWithSearch onInputChange={handleInputChange} valueSearch={formState.location} />
+
         </div>
 
         <div className='custom-container'>
@@ -195,6 +240,13 @@ function Publication () {
         </div>
 
       </form>
+
+      {postState === 'successful' || postState === 'wrongData' || postState === 'failed'
+
+        ? (<div className='alerts-container'>
+          <AlertPublication status={postState} handleAlert={handleAlert} />
+           </div>)
+        : ''}
 
     </>
   )

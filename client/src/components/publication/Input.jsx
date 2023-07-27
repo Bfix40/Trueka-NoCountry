@@ -21,11 +21,11 @@ function Input ({ children, type, ids, placeh, name, onInputChange, categories, 
               </>)
               : <>
                 <p className='input-title'>{children}</p>
-                <select className='form-select' id='input-bot' aria-label='Default select example' name={name} onChange={onInputChange}>
-                  <option value=''>Seleccione la {opcion}</option>
+                <select className='form-select' aria-label='Default select example' id='input-bot' name={name} onChange={onInputChange}>
+                  <option value='' id='category-options'>Seleccione la {opcion}</option>
                   {categories
                     ? categories.map((category, i) => (
-                      <option key={i} value={category._id}>{category.name}</option>
+                      <option key={i} value={category._id} id='category-options'>{category.name}</option>
                     ))
                     : ''}
                 </select>

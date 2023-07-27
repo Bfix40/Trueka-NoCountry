@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { GoogleMap, Marker, Circle, InfoWindow } from '@react-google-maps/api'
 
-function MapView ({ longitude, latitude }) {
+function MapView({ longitude, latitude }) {
   // const location = useSelector(state => state.location)
 
   const mapContainerStyle = {
@@ -40,14 +40,16 @@ function MapView ({ longitude, latitude }) {
         }}
       />
       {showInfoWindow && (
-        <InfoWindow
-          position={center}
-          onCloseClick={() => setShowInfoWindow(false)}
-        >
-          <div>
-            <p>Tu ubicación actual</p>
-          </div>
-        </InfoWindow>
+        <div>
+          <InfoWindow
+            position={center}
+            onCloseClick={() => setShowInfoWindow(false)}
+          >
+            <div>
+              <p>Tu ubicación actual</p>
+            </div>
+          </InfoWindow>
+        </div>
       )}
     </GoogleMap>
   )

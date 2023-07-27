@@ -4,28 +4,17 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 const API_URL = 'http://localhost:3000/api/v1/products'
 
-export const createProduct = createAsyncThunk('products/create', async (product, thunkAPI) => {
+export const createProduct = createAsyncThunk('products/create', async (args, thunkAPI) => {
+  const { token, product } = args
   try {
     const response = await fetch(`${API_URL}`, {
       method: 'POST',
-      // headers: {
-      //   'Content-Type': 'multipart/form-data'
-      // },
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       body: product
     })
-    // if (response.ok || response.status === 201) {
-    //   const data = await response.json()
-    //   return { status: response.status, message: 'El producto ha sido creado con éxito.', data }
-    //   // return data
-    // } else if (response.status === 400) {
-    //   return thunkAPI.rejectWithValue({ status: response.status, message: 'Solicitud incorrecta en los datos del producto.' })
-    // } else if (response.status === 409) {
-    //   return thunkAPI.rejectWithValue({ status: response.status, message: 'El producto ya existe.' })
-    // } else {
-    //   const error = await response.text()
-    //   return thunkAPI.rejectWithValue(error)
-    //   // throw new Error('Algo salio mal')
-    // }
+
     if (!response.ok) {
       const error = await response.text()
       return thunkAPI.rejectWithValue(error)
@@ -86,12 +75,14 @@ export const getProductById = createAsyncThunk(
 )
 
 export const modifyProductById = createAsyncThunk('products/modify',
-  async (newProduct, productId, thunkAPI) => {
+  async (args, thunkAPI) => {
+    const { token, newProduct, productId } = args
     try {
       const response = await fetch(`${API_URL}/${productId}`, {
         method: 'PATCH',
         headers: {
-          'Content-type': 'application/json'
+          'Content-type': 'application/json',
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(newProduct)
       })
@@ -112,12 +103,14 @@ export const modifyProductById = createAsyncThunk('products/modify',
   })
 
 export const deleteProductById = createAsyncThunk('products/delete',
-  async (productId, thunkAPI) => {
+  async (args, thunkAPI) => {
+    const { token, productId } = args
     try {
       const response = await fetch(`${API_URL}/${productId}`, {
         method: 'DELETE',
         headers: {
-          'Content-type': 'application/json'
+          'Content-type': 'application/json',
+          Authorization: `Bearer ${token}`
         }
       })
       if (!response.ok) {

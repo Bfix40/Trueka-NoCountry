@@ -23,11 +23,11 @@ const CategoryTest = () => {
   }, [dispatch])
 
   useEffect(() => {
-    // console.log(categori)
+    console.log(categori)
     if (categori !== '' && categori !== undefined) {
       dispatch(getProductsByCategoryId(categori))
         .then((response) => {
-          // console.log('productos por categoria', response)
+          console.log('productos por categoria', response)
           if (response.payload.length > 0) {
             toast.success('redirigiendo')
             setTimeout(() => {
@@ -57,7 +57,7 @@ const CategoryTest = () => {
           onChange={handleChange}
         >
 
-          <option value=''>Categorias</option>
+          <option value='' className='form-select'>Categorias</option>
           {
           categories.map((obj) =>
             (

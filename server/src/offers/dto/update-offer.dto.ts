@@ -4,7 +4,7 @@ import { OfferStatus } from '../entities/offer.entity';
 
 export class UpdateOfferDto {
   @ApiProperty({
-    description: 'Invoice status',
+    description: 'Offer status',
     nullable: false,
     minLength: 4,
     default: OfferStatus.PENDING,

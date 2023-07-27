@@ -43,6 +43,13 @@
     height: 18px;
     align-items: center;
     gap: 3px;
+    overflow: hidden;
+    
+}
+
+.text-container{
+    display: flex;
+    height: 18px;
 }
 
 .text-card {
